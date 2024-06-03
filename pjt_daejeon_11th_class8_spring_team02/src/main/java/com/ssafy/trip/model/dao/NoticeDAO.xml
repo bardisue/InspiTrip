@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.trip.model.dao.NoticeDAO">
+	<insert id="insert">
+		INSERT INTO notices (mid, title, content, write_date)
+		VALUES (#{mid}, #{title}, #{content}, now())
+	</insert>
+
+	<select id="selectTotalCount">
+		select count(no) from notices
+	</select>
+
+	<select id="selectList" resultMap="noticeInfo">
+		select no, mid, title,
+		content,
+		write_date, read_count
+		from notices order by no desc
+		limit
+		#{sr}, #{cc}
+	</select>
+
+
+	<select id="selectOne" resultMap="noticeInfo">
+		select *
+		from notices
+		where no =
+		#{no}
+	</select>
+
+	<delete id="delete">
+		delete from notices
+		where no = #{no}
+	</delete>
+
+	<update id="update">
+		update notices
+		set title = #{title} , content = #{content}, write_date = now()
+		where no = #{no}
+	</update>
+	
+	<update id="readcountUp">
+		update notices
+		set read_count = read_count + 1
+		where no = #{no}
+	</update>
+	
+	<select id="selectListThree">
+		select *
+		from notices
+		order by no desc
+		limit 3;
+	</select>
+
+	<resultMap type="com.ssafy.trip.model.dto.NoticeDTO"
+		id="noticeInfo">
+		<result column="no" property="no" />
+		<result column="mid" property="mid" />
+		<result column="title" property="title" />
+		<result column="content" property="content" />
+		<result column="write_date" property="write_date" />
+		<result column="read_count" property="read_count" />
+	</resultMap>
+
+</mapper>

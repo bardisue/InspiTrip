@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.trip.model.dao.InfluencerDAO">
+	<select id="selectOne">
+		select *
+		from influencers
+		where no = #{no}
+	</select>
+
+	<select id="selectOneName" resultMap="influencerInfo">
+		select *
+		from influencers
+		where youtube_id like CONCAT('%', #{name}, '%') or name like
+		CONCAT('%', #{name}, '%')
+	</select>
+
+	<select id="selectAll">
+		select *
+		from influencers
+	</select>
+
+	<select id="selectByName">
+		select *
+		from influencers
+		where name like CONCAT('%', #{word}, '%')
+	</select>
+
+	<insert id="addTemp">
+		insert into influencers_temp(name, img, content, url)
+		values (#{name}, #{img}, #{content}, #{url})
+	</insert>
+
+	<insert id="acceptInfluencer">
+		insert into influencers(name, youtube_id, img,
+		content, url)
+		values (#{name}, #{youtubeId}, #{img}, #{content},
+		#{url})
+	</insert>
+
+	<select id="selectTempOne">
+		select *
+		from influencers_temp
+		where no = #{no}
+	</select>
+
+	<delete id="deleteTemp">
+		delete from influencers_temp
+		where no = #{no}
+	</delete>
+
+	<insert id="addVisit"
+		parameterType="com.ssafy.trip.model.dto.VisitDTO"
+		useGeneratedKeys="true" keyProperty="no" keyColumn="no">
+		insert into
+		visits(mid, ino, ano, url)
+		values (#{mid},
+		#{ino}, #{ano}, #{url})
+	</insert>
+
+	<select id="selectList"
+		resultType="com.ssafy.trip.model.dto.VisitDTO">
+		select v.no, v.mid, v.ino, v.ano, v.url, i.name as 'iName',
+		i.img as 'iImg'
+		from visits v join influencers i
+		on v.ino = i.no
+		where
+		ano = #{ano}
+	</select>
+
+	<select id="selectByFollow" resultMap="influencerInfo">
+		select i.no, i.name,
+		i.youtube_id, i.img, i.content, i.url
+		from influencers i
+		join followers
+		f
+		on i.no = f.ino
+		where f.mid = #{id}
+	</select>
+	
+	<select id="tempSelectAll" resultMap="influencerTemp">
+		select *
+		from influencers_temp
+	</select>
+	
+	<resultMap type="com.ssafy.trip.model.dto.InfluencerTempDTO" id="influencerTemp">
+		<result column="no" property="no"/>
+		<result column="name" property="name"/>
+		<result column="img" property="img"/>
+		<result column="content" property="content"/>
+		<result column="url" property="url"/>
+	</resultMap>
+	
+	<resultMap type="com.ssafy.trip.model.dto.InfluencerDTO" id="influencerInfo">
+		<result column="no" property="no"/>
+		<result column="name" property="name"/>
+		<result column="youtube_id" property="youtubeId"/>
+		<result column="img" property="img"/>
+		<result column="content" property="content"/>
+		<result column="url" property="url"/>
+	</resultMap>
+
+	<resultMap type="com.ssafy.trip.model.dto.VisitDTO"
+		id="visitInfo">
+		<result column="no" property="no" />
+		<result column="mid" property="mid" />
+		<result column="ino" property="ino" />
+		<result column="ano" property="ano" />
+		<result column="url" property="url" />
+	</resultMap>
+</mapper>

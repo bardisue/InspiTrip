@@ -1,0 +1,68 @@
+const express = require("express");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const cors = require("cors");
+const app = express();
+const PORT = 3000;
+
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // 1을 더하는 이유는 getMonth()가 0부터 시작하기 때문
+  const day = date.getDate().toString().padStart(2, "0");
+  return `${year}${month}${day}`;
+}
+
+function generateRandomNumber(length) {
+  let randomNumber = "";
+  for (let i = 0; i < length; i++) {
+    randomNumber += Math.floor(Math.random() * 10); // 0부터 9까지의 숫자를 생성
+  }
+  return randomNumber;
+}
+
+// 디렉토리 설정 및 확인
+const uploadDir = "./public/uploads";
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const currentDate = new Date();
+    const formattedDate = formatDate(currentDate);
+    const randomEightDigitNumber = generateRandomNumber(8);
+    const fileExtension = path.extname(file.originalname); // 파일 확장자 추출
+    const newFileName = `${formattedDate}-${randomEightDigitNumber}${fileExtension}`; // 새로운 파일명 생성
+    cb(null, newFileName); // 새로운 파일명 사용
+  },
+});
+
+const upload = multer({ storage: storage });
+
+app.use(cors());
+app.use(express.static("public"));
+
+app.post("/upload", upload.single("image"), (req, res) => {
+  console.log(req)
+  if (!req.file) {
+    return res.status(400).send("");
+  }
+  res.send(`${req.file.filename}`); // 새로운 파일명을 응답에 사용
+});
+
+
+app.post("/upload/Influencer", upload.single("image"), (req, res) => {
+  console.log(req)
+  if (!req.file) {
+    return res.status(400).send("");
+  }
+  res.send(`${req.file.filename}`); // 새로운 파일명을 응답에 사용
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

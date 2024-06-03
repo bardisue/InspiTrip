@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.trip.model.dao.AttractionDAO">
+	<resultMap type="AttractionDto" id="aDto">
+		<result column="content_id" property="contentId" />
+		<result column="content_type_id" property="contentTypeId" />
+		<result column="title" property="title" />
+		<result column="addr1" property="address" />
+		<result column="first_image" property="image" />
+		<result column="sido_code" property="sidoCode" />
+		<result column="gugun_code" property="gunguCode" />
+		<result column="latitude" property="latitude" />
+		<result column="longitude" property="longitude" />
+		<result column="overview" property="overview" />
+	</resultMap>
+
+	<select id="getSidoList">
+		select sido_code as 'sidoCode',sido_name as
+		'sidoName'
+		from sido
+	</select>
+
+	<select id="getGunguList">
+		select gugun_code as 'gunguCode',gugun_name as
+		'gunguName', sido_code as 'sidoCode'
+		from gugun
+		where sido_code =
+		#{sido}
+	</select>
+
+	<select id="getAttractionListBySidoGungu" resultMap="aDto">
+		select
+		ai.content_id, ai.content_type_id, ai.title,
+		ai.addr1,
+		ai.first_image,
+		ai.sido_code, ai.gugun_code, ai.latitude,
+		ai.longitude, ad.overview
+		from attraction_info ai left join
+		attraction_description ad on
+		ai.content_id = ad.content_id
+		where
+		ai.sido_code = #{sido} and
+		ai.gugun_code = #{gungu}
+	</select>
+	<select id="getAttractionListBySidoGunguTypeId" resultMap="aDto">
+		select ai.content_id, ai.content_type_id, ai.title,
+		ai.addr1,
+		ai.first_image,
+		ai.sido_code, ai.gugun_code, ai.latitude,
+		ai.longitude,
+		ad.overview
+		from attraction_info ai left join
+		attraction_description ad
+		on
+		ai.content_id = ad.content_id
+		where
+		ai.sido_code = #{sido} and
+		ai.gugun_code = #{gungu}
+		and
+		ai.content_type_id = #{contentTypeId}
+	</select>
+
+	<select id="getAttractionListByLocation" resultMap="aDto">
+		select
+		ai.content_id, ai.content_type_id, ai.title,
+		ai.addr1, ai.first_image,
+		ai.sido_code, ai.gugun_code, ai.latitude,
+		ai.longitude, ad.overview
+		from attraction_info ai left join
+		attraction_description ad on
+		ai.content_id = ad.content_id
+		where
+		ai.latitude > #{min_latitude}
+		and
+		#{max_latitude} > ai.latitude
+		and ai.longitude > #{min_longitude}
+		and
+		#{max_longitude} > ai.longitude
+	</select>
+
+	<select id="getAttractionListByLocationTypeId" resultMap="aDto">
+		select
+		ai.content_id, ai.content_type_id, ai.title, ai.addr1,
+		ai.first_image,
+		ai.sido_code, ai.gugun_code, ai.latitude,
+		ai.longitude, ad.overview
+		from attraction_info ai left join
+		attraction_description ad on
+		ai.content_id = ad.content_id
+		where
+		ai.latitude > #{min_latitude}
+		and
+		#{max_latitude} > ai.latitude
+		and ai.longitude > #{min_longitude}
+		and
+		#{max_longitude} > ai.longitude
+		and content_type_id = #{contentTypeId}
+	</select>
+	<select id="getAttraction" resultMap="aDto">
+		select
+		ai.content_id,
+		ai.content_type_id, ai.title,
+		ai.addr1,
+		ai.first_image,
+		ai.sido_code,
+		ai.gugun_code, ai.latitude,
+		ai.longitude, ad.overview
+		from
+		attraction_info ai left join
+		attraction_description ad on
+		ai.content_id
+		= ad.content_id
+		where
+		ai.content_id = #{contentId}
+	</select>
+
+	<select id="getAttractionListByInfluencer" resultMap="aDto">
+		select
+		ai.content_id, ai.content_type_id, ai.title,
+		ai.addr1,
+		ai.first_image,
+		ai.sido_code,
+		ai.gugun_code, ai.latitude,
+		ai.longitude, ad.overview
+		from
+		attraction_info ai left join
+		attraction_description ad on
+		ai.content_id
+		= ad.content_id
+		left join visits v
+		on ai.content_id = v.ano
+		where v.ino =
+		#{ino}
+	</select>
+
+	<insert id="insert"
+		parameterType="com.ssafy.trip.model.dto.AttractionDto">
+		insert into attraction_info(content_id, content_type_id,
+		title, addr1, first_image, readcount, sido_code, gugun_code, latitude,
+		longitude)
+		values (#{contentId}, #{contentTypeId}, #{title},
+		#{address}, #{image}, 0, #{sidoCode}, #{gunguCode}, #{latitude},
+		#{longitude})
+	</insert>
+
+	<insert id="insertOverview"
+		parameterType="com.ssafy.trip.model.dto.AttractionDto">
+		insert into attraction_description(content_id, overview)
+		values (#{contentId}, #{overview})
+	</insert>
+
+	<select id="searchAttractionContentId" resultType="String">
+		select
+		content_id
+		from attraction_info
+		where addr1 = #{addr} and title =
+		#{title}
+	</select>
+
+	<select id="getAttractionContentId" resultType="int">
+		select
+		max(content_id)+1
+		from attraction_info
+	</select>
+
+	<select id="getRand"  resultMap="aDto">
+		SELECT * FROM attraction_info
+		ORDER BY RAND()
+		LIMIT 1;
+	</select>
+</mapper>

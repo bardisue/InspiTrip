@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.trip.model.dao.AlarmDAO">
+	<insert id="insertAlarm"
+		parameterType="com.ssafy.trip.model.dto.AlarmDTO">
+		insert into alarm(vno, mid)
+		values (#{vno}, #{mid})
+	</insert>
+	<select id="selectAlarmsByMemberId">
+		select a.no, a.vno, a.mid, a.checked, a.created_at as
+		createdAt, v.ino,
+		v.ano, i.name as iName, i.img, ai.title as aName
+		FROM
+		alarm a
+		JOIN
+		visits v ON a.vno = v.no
+		JOIN
+		influencers i ON v.ino = i.no
+		JOIN
+		attraction_info ai ON v.ano = ai.content_id
+		where a.mid = #{mid}
+		order by a.no desc;
+	</select>
+
+	<update id="readAlarm">
+		UPDATE alarm
+		SET checked = true
+		WHERE no = #{no}
+	</update>
+	<delete id="deleteAlarm">
+		delete
+		from alarm
+		WHERE no = #{no}
+	</delete>
+</mapper>

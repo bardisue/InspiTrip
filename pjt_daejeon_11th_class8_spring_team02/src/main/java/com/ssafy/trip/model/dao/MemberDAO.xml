@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.trip.model.dao.MemberDAO">
+	<insert id="insert" parameterType="MemberDTO"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into members(id, pw, name,
+		email, gender, tel, img)
+		values (#{id}, #{pw}, #{name}, #{email},
+		#{gender}, #{tel}, #{img})
+	</insert>
+
+	<update id="update" parameterType="MemberDTO"
+		useGeneratedKeys="true" keyProperty="id">
+		update members
+		set pw = #{pw}, name
+		= #{name}, email = #{email}, gender = #{gender}, tel = #{tel}, img =
+		#{img}
+		where id = #{id}
+	</update>
+
+	<delete id="delete" parameterType="MemberDTO">
+		delete from members
+		where id =
+		#{id} and pw = #{pw}
+	</delete>
+
+	<select id="idCheck" resultMap="MemberInfo">
+		select *
+		from members
+		where id =
+		#{id}
+	</select>
+
+	<select id="login" resultMap="MemberInfo">
+		select *
+		from members
+		where id =
+		#{id} and pw = #{pw}
+	</select>
+
+
+	<select id="selectOne" resultMap="MemberInfo">
+		select *
+		from members
+		where id =
+		#{id}
+	</select>
+
+	<select id="checkAlready">
+		select count(ino)
+		from followers
+		where mid=#{mid}
+		and
+		ino=#{ino}
+	</select>
+
+	<insert id="follow">
+		insert into followers(mid, ino, follow_date)
+		values
+		(#{mid}, #{ino}, NOW())
+	</insert>
+	
+	<select id="getFollowersByInfluencerId" resultType="String">
+		select mid from followers where ino = #{ino};
+	</select>
+
+
+	<resultMap type="MemberDTO" id="MemberInfo">
+		<result column="id" property="id" />
+		<result column="pw" property="pw" />
+		<result column="name" property="name" />
+		<result column="email" property="email" />
+		<result column="gender" property="gender" />
+		<result column="tel" property="tel" />
+		<result column="img" property="img" />
+	</resultMap>
+</mapper>

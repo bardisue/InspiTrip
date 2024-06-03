@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.trip.model.dao.MemberReviewDAO">
+	<insert id="insert"
+		parameterType="com.ssafy.trip.model.dto.MemberReviewDTO"
+		useGeneratedKeys="true" keyProperty="no">
+		insert into member_reviews(ano,
+		mid, content, write_date, grade)
+		values (#{ano}, #{mid}, #{content},
+		now(), #{grade})
+	</insert>
+
+	<insert id="insertImage"
+		parameterType="com.ssafy.trip.model.dto.ReviewImageDTO">
+		insert into member_review_files(rno, url)
+		values (#{rno},
+		#{url})
+	</insert>
+
+	<select id="selectOne" resultMap="reviewInfo">
+		select *
+		from member_reviews
+		where
+		<if test="ano != null">
+			ano = #{ano} and
+		</if>
+		mid = #{mid}
+	</select>
+	<select id="selectAll" resultMap="reviewInfo">
+		select *
+		from member_reviews
+		where ano = #{ano}
+		order by write_date desc
+	</select>
+
+	<select id="getImage" resultMap="reviewImageInfo">
+		select *
+		from member_review_files
+		where rno = #{rno}
+	</select>
+
+	<select id="getAvg">
+		select avg(grade)
+		from member_reviews
+		where ano = #{ano};
+	</select>
+
+	<resultMap type="com.ssafy.trip.model.dto.MemberReviewDTO"
+		id="reviewInfo">
+		<result column="no" property="no" />
+		<result column="ano" property="ano" />
+		<result column="mid" property="mid" />
+		<result column="content" property="content" />
+		<result column="write_date" property="writeDate" />
+		<result column="grade" property="grade" />
+	</resultMap>
+
+	<resultMap type="com.ssafy.trip.model.dto.ReviewImageDTO"
+		id="reviewImageInfo">
+		<result column="no" property="no" />
+		<result column="rno" property="rno" />
+		<result column="url" property="url" />
+	</resultMap>
+</mapper>
